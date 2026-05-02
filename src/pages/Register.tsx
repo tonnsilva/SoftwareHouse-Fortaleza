@@ -26,6 +26,7 @@ export const Register: React.FC = () => {
         options: {
           data: {
             full_name: name,
+            consent_accepted: true,
           },
         },
       });

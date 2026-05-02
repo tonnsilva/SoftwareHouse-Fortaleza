@@ -70,8 +70,17 @@ O projeto estará disponível em `http://localhost:3000`.
 ## ☁️ Deploy (Vercel)
 
 1. Conecte seu repositório GitHub na [Vercel](https://vercel.com).
-2. Adicione as variáveis de ambiente (`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`) nas configurações de build da Vercel.
-3. O deploy será feito automaticamente a cada push na branch principal.
+2. **IMPORTANTE:** Adicione as variáveis de ambiente manualmente no painel da Vercel:
+   - `VITE_SUPABASE_URL`: A URL do seu projeto (ex: `https://xyz.supabase.co`)
+   - `VITE_SUPABASE_ANON_KEY`: A sua chave "anon" pública.
+3. Certifique-se de que NÃO existam espaços ou aspas extras nos valores das variáveis. No painel da Vercel, o **Framework Preset** deve ser detectado automaticamente como **Vite**.
+4. O deploy será feito automaticamente a cada push na branch principal.
+
+### Solução de Problemas (Vercel Build Error)
+Se o build na Vercel falhar com "exit code 1":
+- Verifique se as variáveis de ambiente começam com `VITE_`.
+- Verifique se o `package-lock.json` está atualizado.
+- Verifique se as chaves estão corretas (uma URL começando com https e uma chave longa).
 
 ## 🛡️ Segurança e Boas Práticas
 

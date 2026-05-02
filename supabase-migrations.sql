@@ -11,6 +11,7 @@ CREATE TABLE public.profiles (
   role TEXT DEFAULT 'student' CHECK (role IN ('admin', 'student')),
   avatar_url TEXT,
   bio TEXT,
+  consent_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -55,8 +56,14 @@ CREATE POLICY "Only admins can modify courses." ON public.courses
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, name, email, role)
-  VALUES (new.id, new.raw_user_meta_data->>'full_name', new.email, 'student');
+  INSERT INTO public.profiles (id, name, email, role, consent_at)
+  VALUES (
+    new.id, 
+    new.raw_user_meta_data->>'full_name', 
+    new.email, 
+    'student',
+    COALESCE((new.raw_user_meta_data->>'consent_accepted')::boolean, true)::text::timestamp -- Default to true for this simplified flow or handle as needed
+  );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -42,9 +42,9 @@ export const RecoverPassword: React.FC = () => {
           <p className="text-zinc-400 text-sm">
             Enviamos um link de recuperação para <strong>{email}</strong>. Siga as instruções no e-mail para redefinir sua senha.
           </p>
-          <Button variant="outline" className="w-full" asChild>
-            <Link to="/login">Voltar ao login</Link>
-          </Button>
+          <Link to="/login" className="block w-full">
+            <Button variant="outline" className="w-full">Voltar ao login</Button>
+          </Link>
         </div>
       </AuthLayout>
     );

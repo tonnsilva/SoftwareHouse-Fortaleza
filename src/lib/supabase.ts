@@ -1,16 +1,26 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
-const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || '';
+
+const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error(
     'ERRO NO SUPABASE: Variáveis de ambiente não encontradas.\n' +
-    'Certifique-se de configurar VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no painel da Vercel.'
+    'VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY são obrigatórias.'
   );
 }
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseAnonKey || 'placeholder'
-);
+// Se a URL for inválida, usamos uma URL de fallback segura para evitar que o createClient dispare uma exceção fatal
+const finalUrl = isValidUrl(supabaseUrl) ? supabaseUrl : 'https://placeholder-project.supabase.co';
+const finalKey = supabaseAnonKey || 'placeholder-key';
+
+export const supabase = createClient(finalUrl, finalKey);

@@ -23,9 +23,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-600/40 overflow-hidden p-1">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+        <div className="flex flex-col items-center mb-8 text-center px-4">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-2xl shadow-emerald-600/40 overflow-hidden p-1">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <span className="font-bold text-xl tracking-tight text-white italic">Software House Fortaleza</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{title}</h1>
           <p className="text-zinc-500 text-center text-balance">{subtitle}</p>
@@ -36,7 +39,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
         </div>
 
         <p className="mt-8 text-center text-sm text-zinc-600">
-          © 2026 SoftwareHouse Fortaleza. Todos os direitos reservados.
+          © 2026 Software House Fortaleza. Todos os direitos reservados.
         </p>
       </motion.div>
     </div>

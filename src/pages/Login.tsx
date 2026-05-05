@@ -36,7 +36,7 @@ export const Login: React.FC = () => {
   return (
     <AuthLayout
       title="Acesso Restrito"
-      subtitle="Identifique-se para acessar o prontuário técnico da SoftwareHouse Fortaleza."
+      subtitle="Identifique-se para acessar o prontuário técnico da Software House Fortaleza."
     >
       <form onSubmit={handleLogin} className="space-y-5">
         <Input
@@ -83,7 +83,7 @@ export const Login: React.FC = () => {
             <div className="w-full border-t border-zinc-900"></div>
           </div>
           <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-zinc-600">
-            <span className="bg-black px-4">SoftwareHouse Fortaleza</span>
+            <span className="bg-black px-4">Software House Fortaleza</span>
           </div>
         </div>
 

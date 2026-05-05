@@ -77,7 +77,7 @@ export const Register: React.FC = () => {
   return (
     <AuthLayout
       title="Criar nova conta"
-      subtitle="Filiado à SoftwareHouse Fortaleza. Inicie sua jornada técnica profissional."
+      subtitle="Filiado à Software House Fortaleza. Inicie sua jornada técnica profissional."
     >
       <form onSubmit={handleRegister} className="space-y-4">
         <Input

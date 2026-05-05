@@ -25,7 +25,7 @@ export const LGPDConsent: React.FC<LGPDConsentProps> = ({ accepted, onAccept, re
           <span className="text-emerald-500 hover:text-emerald-400 font-medium transition-colors">
             Política de Privacidade (LGPD)
           </span>{' '}
-          da SoftwareHouse Fortaleza.
+          da Software House Fortaleza.
         </label>
         {required && (
           <span className="block mt-1 text-[10px] text-zinc-600 italic">

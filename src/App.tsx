@@ -4,6 +4,10 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { RecoverPassword } from './pages/RecoverPassword';
 import { Dashboard } from './pages/Dashboard';
+import { MeusCursos } from './pages/MeusCursos';
+import { Projetos } from './pages/Projetos';
+import { Comunidade } from './pages/Comunidade';
+import { Usuarios } from './pages/Usuarios';
 import { useAuth } from './hooks/useAuth';
 import SupabaseSetup from './components/SupabaseSetup';
 
@@ -46,6 +50,38 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/meus-cursos"
+          element={
+            <ProtectedRoute>
+              <MeusCursos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projetos"
+          element={
+            <ProtectedRoute>
+              <Projetos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/comunidade"
+          element={
+            <ProtectedRoute>
+              <Comunidade />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute>
+              <Usuarios />
             </ProtectedRoute>
           }
         />

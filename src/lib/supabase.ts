@@ -1,7 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
+// Função para buscar chaves, priorizando localStorage (runtime setup) e depois env vars
+const getKeys = () => {
+  const localUrl = localStorage.getItem('SB_URL');
+  const localKey = localStorage.getItem('SB_KEY');
+  
+  return {
+    url: localUrl || (import.meta as any).env?.VITE_SUPABASE_URL || '',
+    key: localKey || (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || ''
+  };
+};
+
+const keys = getKeys();
 
 const isValidUrl = (url: string) => {
   if (!url || typeof url !== 'string') return false;
@@ -13,15 +23,15 @@ const isValidUrl = (url: string) => {
   }
 };
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'AVISO: VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY não configuradas.\n' +
-    'O app pode não funcionar corretamente até que você adicione as chaves no painel de Segredos ou Vercel.'
-  );
-}
-
-// Fallback preventivo para evitar crash no createClient
-const finalUrl = isValidUrl(supabaseUrl) ? supabaseUrl : 'https://your-project-id.supabase.co';
-const finalKey = supabaseAnonKey || 'your-anon-key';
+// Fallback preventivo
+const finalUrl = isValidUrl(keys.url) ? keys.url : 'https://your-project-id.supabase.co';
+const finalKey = keys.key || 'your-anon-key';
 
 export const supabase = createClient(finalUrl, finalKey);
+
+// Função para atualizar as chaves e recarregar
+export const updateSupabaseConfig = (url: string, key: string) => {
+  localStorage.setItem('SB_URL', url);
+  localStorage.setItem('SB_KEY', key);
+  window.location.reload();
+};

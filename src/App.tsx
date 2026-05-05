@@ -5,6 +5,7 @@ import { Register } from './pages/Register';
 import { RecoverPassword } from './pages/RecoverPassword';
 import { Dashboard } from './pages/Dashboard';
 import { useAuth } from './hooks/useAuth';
+import SupabaseSetup from './components/SupabaseSetup';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -25,28 +26,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default function App() {
+  // Verifica se o Supabase está configurado (via ENV ou via LocalStorage)
   const isConfigured = 
-    import.meta.env.VITE_SUPABASE_URL && 
-    import.meta.env.VITE_SUPABASE_ANON_KEY &&
-    import.meta.env.VITE_SUPABASE_URL.startsWith('http');
+    ((import.meta as any).env?.VITE_SUPABASE_URL && (import.meta as any).env?.VITE_SUPABASE_URL.startsWith('http')) ||
+    (localStorage.getItem('SB_URL') && localStorage.getItem('SB_URL')?.startsWith('http'));
 
-  if (!isConfigured && process.env.NODE_ENV === 'production') {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 text-center">
-        <div className="max-w-md space-y-4 border border-zinc-800 p-8 rounded-xl bg-zinc-900/50">
-          <h1 className="text-xl font-bold text-red-500">Configuração Pendente</h1>
-          <p className="text-zinc-400">
-            As variáveis de ambiente <strong>VITE_SUPABASE_URL</strong> e <strong>VITE_SUPABASE_ANON_KEY</strong> não foram detectadas no painel da Vercel.
-          </p>
-          <div className="text-left text-sm bg-black p-4 rounded font-mono text-zinc-500">
-            1. Vá em Project Settings<br/>
-            2. Environment Variables<br/>
-            3. Adicione as chaves<br/>
-            4. Faça um novo Deploy
-          </div>
-        </div>
-      </div>
-    );
+  if (!isConfigured) {
+    return <SupabaseSetup />;
   }
 
   return (

@@ -35,14 +35,14 @@ export const Login: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Bem-vindo de volta"
-      subtitle="Entre com suas credenciais para acessar sua área de estudos."
+      title="Acesso Restrito"
+      subtitle="Identifique-se para acessar o prontuário técnico da SoftwareHouse Fortaleza."
     >
       <form onSubmit={handleLogin} className="space-y-5">
         <Input
-          label="E-mail"
+          label="E-mail Funcional"
           type="email"
-          placeholder="seu@nome.com"
+          placeholder="colaborador@shf.com.br"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -57,38 +57,41 @@ export const Login: React.FC = () => {
             required
           />
           <div className="flex justify-end">
-            <Link to="/recover" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-              Esqueceu sua senha?
+            <Link to="/recover" className="text-xs text-emerald-500 hover:text-emerald-400 font-medium transition-colors">
+              Recuperar Password
             </Link>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-3 rounded-lg flex items-center gap-2">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-3 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
             <span>{error}</span>
           </div>
         )}
 
-        <Button type="submit" className="w-full" isLoading={loading}>
-          Entrar no sistema
+        <Button 
+          type="submit" 
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-none shadow-lg shadow-emerald-900/40" 
+          isLoading={loading}
+        >
+          Autenticar no Terminal
           <LogIn className="ml-2 w-4 h-4" />
         </Button>
 
-        <div className="relative py-2">
+        <div className="relative py-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-800"></div>
+            <div className="w-full border-t border-zinc-900"></div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-zinc-500">Ou continue com</span>
+          <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-zinc-600">
+            <span className="bg-black px-4">SoftwareHouse Fortaleza</span>
           </div>
         </div>
 
-        <Button variant="outline" className="w-full" type="button">
-          Não tem uma conta?
-          <Link to="/register" className="ml-2 flex items-center text-white hover:text-indigo-400 transition-colors">
-            Cadastre-se <ArrowRight className="ml-1 w-3 h-3" />
+        <div className="pt-2 text-center">
+          <Link to="/register" className="text-xs text-zinc-500 hover:text-emerald-400 transition-colors flex items-center justify-center gap-1 group">
+            Não possui registro? <span className="group-hover:underline underline-offset-4">Solicitar acesso</span> <ArrowRight size={12} />
           </Link>
-        </Button>
+        </div>
       </form>
     </AuthLayout>
   );

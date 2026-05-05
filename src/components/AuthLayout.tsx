@@ -1,6 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Terminal } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -10,11 +9,11 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
   return (
-    <div className="min-h-screen bg-black text-zinc-100 flex items-center justify-center p-6 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-black text-zinc-100 flex items-center justify-center p-6 selection:bg-emerald-500/30">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 rounded-full blur-[120px]" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 pointer-events-none" />
       </div>
 
@@ -25,8 +24,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
         className="w-full max-w-md relative z-10"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-indigo-600/40 transform rotate-3">
-            <Terminal className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-600/40 overflow-hidden p-1">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{title}</h1>
           <p className="text-zinc-500 text-center text-balance">{subtitle}</p>

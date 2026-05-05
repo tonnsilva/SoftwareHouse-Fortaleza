@@ -35,7 +35,7 @@ export const RecoverPassword: React.FC = () => {
       <AuthLayout title="E-mail enviado" subtitle="Verifique sua caixa de entrada.">
         <div className="text-center space-y-6">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center text-green-500">
+            <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500">
               <CheckCircle2 size={32} />
             </div>
           </div>

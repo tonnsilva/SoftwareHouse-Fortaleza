@@ -4,6 +4,12 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* SH-Fortaleza Professional Green Palette */
+  --color-brand-primary: #10b981; /* Emerald 500 */
+  --color-brand-hover: #059669;    /* Emerald 600 */
+  --color-brand-surface: #ecfdf5;  /* Emerald 50 */
+  --color-brand-border: #064e3b;   /* Emerald 900 */
 }
 
 @layer base {

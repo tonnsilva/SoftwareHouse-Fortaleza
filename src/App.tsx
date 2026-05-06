@@ -1,92 +1,29 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import { Usuarios } from './pages/Usuarios';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
-import { RecoverPassword } from './pages/RecoverPassword';
 import { Dashboard } from './pages/Dashboard';
-import { MeusCursos } from './pages/MeusCursos';
-import { Projetos } from './pages/Projetos';
-import { Comunidade } from './pages/Comunidade';
-import { Usuarios } from './pages/Usuarios';
-import { useAuth } from './hooks/useAuth';
-import SupabaseSetup from './components/SupabaseSetup';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const Protected = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center text-emerald-500">Iniciando Sistemas...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" />;
   return <>{children}</>;
 };
 
 export default function App() {
-  // Verifica se o Supabase está configurado (via ENV ou via LocalStorage)
-  const isConfigured = 
-    ((import.meta as any).env?.VITE_SUPABASE_URL && (import.meta as any).env?.VITE_SUPABASE_URL.startsWith('http')) ||
-    (localStorage.getItem('SB_URL') && localStorage.getItem('SB_URL')?.startsWith('http'));
-
-  if (!isConfigured) {
-    return <SupabaseSetup />;
-  }
-
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/recover" element={<RecoverPassword />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/meus-cursos"
-          element={
-            <ProtectedRoute>
-              <MeusCursos />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/projetos"
-          element={
-            <ProtectedRoute>
-              <Projetos />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/comunidade"
-          element={
-            <ProtectedRoute>
-              <Comunidade />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/usuarios"
-          element={
-            <ProtectedRoute>
-              <Usuarios />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/usuarios" element={<Protected><Usuarios /></Protected>} />
+        <Route path="/meus-cursos" element={<Protected><Dashboard /></Protected>} />
+        <Route path="/projetos" element={<Protected><Dashboard /></Protected>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

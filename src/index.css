@@ -1,46 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap');
 @import "tailwindcss";
 
+/**
+ * ESTILOS GLOBAIS
+ * 
+ * FUNÇÃO: Define o visual base, cores e scrollbars do sistema.
+ */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  
-  /* SH-Fortaleza Professional Green Palette */
-  --color-brand-primary: #10b981; /* Emerald 500 */
-  --color-brand-hover: #059669;    /* Emerald 600 */
-  --color-brand-surface: #ecfdf5;  /* Emerald 50 */
-  --color-brand-border: #064e3b;   /* Emerald 900 */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 @layer base {
   body {
-    @apply bg-black text-zinc-100 antialiased font-sans;
-  }
-
-  * {
-    @apply border-zinc-900;
+    @apply bg-black text-zinc-100 antialiased overflow-x-hidden;
   }
 }
 
-/* Custom noise effect overlay */
-.noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #000;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #18181b;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #27272a;
-}
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #10b981; }

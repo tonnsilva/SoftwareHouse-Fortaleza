@@ -1,185 +1,157 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/Layout';
-import { UserPlus, Search, MoreVertical, Shield, User, Mail, Calendar, Trash2, Edit2, CheckCircle2, XCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { userService, UserProfile } from '../services/userService';
+import { motion, AnimatePresence } from 'motion/react';
+import { UserPlus, Search, Shield, User, Mail, Trash2, Edit2, CheckCircle2, XCircle, AlertCircle, X } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
+/**
+ * PÁGINA DE GESTÃO DE USUÁRIOS
+ * 
+ * FUNÇÃO: Dashboard administrativo para controle total sobre os membros da plataforma.
+ */
 export function Usuarios() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAddingMode, setIsAddingMode] = useState(false);
-
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  const [error, setError] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
+  
+  const [newUser, setNewUser] = useState<Omit<UserProfile, 'id' | 'created_at'>>({
+    full_name: '',
+    email: '',
+    role: 'student',
+    status: 'active',
+    avatar_url: ''
+  });
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       const data = await userService.getAllUsers();
-      // If empty, add some mock data for visualization if it's the first time
       setUsers(data);
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error);
+    } catch (err: any) {
+      setError('Erro ao carregar lista de usuários.');
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => { loadUsers(); }, []);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await userService.createUser(newUser);
+      setIsAdding(false);
+      loadUsers();
+    } catch (err: any) {
+      setError('Erro ao cadastrar novo usuário.');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Deseja remover este usuário permanentemente?')) return;
+    try {
+      await userService.deleteUser(id);
+      loadUsers();
+    } catch (err) {
+      setError('Erro ao deletar usuário.');
+    }
+  };
+
+  const filteredUsers = users.filter(u => 
+    u.full_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    u.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <Layout 
-      title="Gestão de Usuários"
+      title="Usuários SHF"
       headerAction={
-        <Button 
-          size="sm" 
-          className="bg-emerald-600 hover:bg-emerald-500 gap-2"
-          onClick={() => setIsAddingMode(true)}
-        >
-          <UserPlus size={16} /> Adicionar Membro
+        <Button onClick={() => setIsAdding(true)} className="bg-emerald-600 gap-2">
+          <UserPlus size={16} /> Novo Membro
         </Button>
       }
     >
       <div className="space-y-6">
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-900/30 p-4 rounded-2xl border border-zinc-800">
-          <div className="relative w-full md:w-96">
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm flex items-center gap-2">
+            <AlertCircle size={16} /> {error}
+          </div>
+        )}
+
+        <AnimatePresence>
+          {isAdding && (
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
+              <form onSubmit={handleCreate} className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-white font-bold">Cadastrar Novo Membro</h3>
+                  <button type="button" onClick={() => setIsAdding(false)}><X size={20} /></button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input placeholder="Nome Completo" className="bg-black border border-zinc-800 rounded-lg p-2.5 text-sm" value={newUser.full_name} onChange={e => setNewUser({...newUser, full_name: e.target.value})} required />
+                  <input placeholder="E-mail Funcional" type="email" className="bg-black border border-zinc-800 rounded-lg p-2.5 text-sm" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} required />
+                  <select className="bg-black border border-zinc-800 rounded-lg p-2.5 text-sm" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value as any})}>
+                    <option value="student">Aluno</option>
+                    <option value="instructor">Instrutor</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                  <select className="bg-black border border-zinc-800 rounded-lg p-2.5 text-sm" value={newUser.status} onChange={e => setNewUser({...newUser, status: e.target.value as any})}>
+                    <option value="active">Ativo</option>
+                    <option value="pending">Pendente</option>
+                    <option value="inactive">Inativo</option>
+                  </select>
+                </div>
+                <Button type="submit" className="w-full bg-emerald-600">Salvar no Banco</Button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex bg-zinc-900/30 p-4 rounded-xl border border-zinc-800">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar por nome ou e-mail..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-black border border-zinc-800 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:border-emerald-500 outline-none transition-all placeholder:text-zinc-600 text-white"
-            />
-          </div>
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 rounded-full border border-zinc-700">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> {users.filter(u => u.status === 'active').length} Ativos
-            </span>
-            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800/50 rounded-full border border-zinc-700">
-              <div className="w-1.5 h-1.5 bg-zinc-600 rounded-full" /> {users.length} Total
-            </span>
+            <input placeholder="Filtrar por nome ou e-mail..." className="w-full bg-black border border-zinc-800 rounded-lg py-2 pl-10 pr-4 text-sm" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
           </div>
         </div>
 
-        {/* Users Table */}
-        <div className="bg-zinc-900/20 border border-zinc-900 rounded-3xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-900 bg-zinc-950/50">
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Membro</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Função / Role</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Status</th>
-                  <th className="px-6 py-4 text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Acesso</th>
-                  <th className="px-6 py-4 text-right"></th>
+        <div className="overflow-hidden border border-zinc-900 rounded-2xl">
+          <table className="w-full text-left">
+            <thead className="bg-zinc-950 border-b border-zinc-900">
+              <tr>
+                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">Membro</th>
+                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">Cargo</th>
+                <th className="px-6 py-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-4 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-900">
+              {filteredUsers.map((user) => (
+                <tr key={user.id} className="hover:bg-zinc-900/20 transition-colors">
+                  <td className="px-6 py-4 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white uppercase">{user.full_name[0]}</div>
+                    <div>
+                      <div className="text-sm font-bold text-white">{user.full_name}</div>
+                      <div className="text-xs text-zinc-500">{user.email}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-xs capitalize px-2 py-1 bg-zinc-800 rounded text-zinc-400">{user.role}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${user.status === 'active' ? 'text-emerald-500 bg-emerald-500/10' : 'text-zinc-500 bg-zinc-800'}`}>
+                      {user.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button onClick={() => handleDelete(user.id!)} className="p-2 text-zinc-500 hover:text-red-400"><Trash2 size={16} /></button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-900">
-                <AnimatePresence>
-                  {loading ? (
-                    <tr>
-                      <td colSpan={5} className="py-20 text-center">
-                        <div className="inline-block w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                      </td>
-                    </tr>
-                  ) : filteredUsers.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-20 text-center text-zinc-600 text-sm italic">
-                        Nenhum membro encontrado com os critérios de busca.
-                      </td>
-                    </tr>
-                  ) : filteredUsers.map((user, idx) => (
-                    <motion.tr 
-                      key={user.id || idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="hover:bg-zinc-900/40 transition-colors group"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <img 
-                              src={user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=10b981&color=fff`} 
-                              alt={user.full_name}
-                              className="w-10 h-10 rounded-full object-cover border border-zinc-800"
-                            />
-                            {user.status === 'active' && (
-                              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-black rounded-full" />
-                            )}
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">
-                              {user.full_name}
-                            </div>
-                            <div className="text-xs text-zinc-500 flex items-center gap-1">
-                              <Mail size={10} /> {user.email}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className={`p-1.5 rounded-lg ${
-                            user.role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 
-                            user.role === 'instructor' ? 'bg-amber-500/10 text-amber-400' : 
-                            'bg-emerald-500/10 text-emerald-400'
-                          }`}>
-                            {user.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
-                          </div>
-                          <span className="text-xs font-medium capitalize text-zinc-300">{user.role}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                          user.status === 'active' 
-                            ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/20' 
-                            : user.status === 'pending'
-                            ? 'bg-amber-500/5 text-amber-500 border-amber-500/20'
-                            : 'bg-zinc-800 text-zinc-500 border-zinc-700'
-                        }`}>
-                          {user.status === 'active' ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
-                          {user.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-xs text-zinc-300">Há 2 dias</span>
-                          <span className="text-[10px] text-zinc-600 flex items-center gap-1">
-                            <Calendar size={10} /> 12 Jan, 2026
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
-                            <Edit2 size={16} />
-                          </button>
-                          <button className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {/* Footer info */}
-        <p className="text-[10px] text-center text-zinc-600 uppercase tracking-widest py-4">
-          Visualizando administradores e membros da Software House Fortaleza
-        </p>
       </div>
     </Layout>
   );

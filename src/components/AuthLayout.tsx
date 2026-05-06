@@ -1,46 +1,26 @@
 import React from 'react';
 import { motion } from 'motion/react';
 
-interface AuthLayoutProps {
-  children: React.ReactNode;
-  title: string;
-  subtitle: string;
-}
-
-export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
+/**
+ * AUTH LAYOUT
+ * 
+ * FUNÇÃO: Componente visual que envolve as telas de Login e Registro.
+ * Fornece o fundo escuro, logo e animações de transição.
+ */
+export const AuthLayout: React.FC<{ children: React.ReactNode; title: string; subtitle: string }> = ({ children, title, subtitle }) => {
   return (
-    <div className="min-h-screen bg-black text-zinc-100 flex items-center justify-center p-6 selection:bg-emerald-500/30">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-900/10 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 pointer-events-none" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md relative z-10"
-      >
-        <div className="flex flex-col items-center mb-8 text-center px-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-2xl shadow-emerald-600/40 overflow-hidden p-1">
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-white italic">Software House Fortaleza</span>
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 bg-[grid-white]/[0.02]">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-white rounded-2xl mx-auto mb-6 flex items-center justify-center p-2 shadow-2xl shadow-emerald-500/20">
+            <img src="/logo.png" alt="SHF" className="object-contain" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">{title}</h1>
-          <p className="text-zinc-500 text-center text-balance">{subtitle}</p>
+          <h1 className="text-3xl font-black tracking-tighter text-white">{title}</h1>
+          <p className="text-zinc-500 text-sm mt-2">{subtitle}</p>
         </div>
-
-        <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 p-8 rounded-3xl shadow-2xl">
+        <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 p-8 rounded-3xl">
           {children}
         </div>
-
-        <p className="mt-8 text-center text-sm text-zinc-600">
-          © 2026 Software House Fortaleza. Todos os direitos reservados.
-        </p>
       </motion.div>
     </div>
   );

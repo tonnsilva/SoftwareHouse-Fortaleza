@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Função para buscar chaves, priorizando localStorage (runtime setup) e depois env vars
+/**
+ * CONFIGURAÇÃO DO SUPABASE
+ * 
+ * FUNÇÃO: Estabelece a conexão com o banco de dados e serviço de autenticação.
+ * Utilizamos localStorage para permitir que você configure sua própria URL e Chave sem expor no código.
+ */
 const getKeys = () => {
   const localUrl = localStorage.getItem('SB_URL');
   const localKey = localStorage.getItem('SB_KEY');
@@ -13,23 +18,11 @@ const getKeys = () => {
 
 const keys = getKeys();
 
-const isValidUrl = (url: string) => {
-  if (!url || typeof url !== 'string') return false;
-  try {
-    const parsed = new URL(url);
-    return (parsed.protocol === 'http:' || parsed.protocol === 'https:') && url.includes('.');
-  } catch {
-    return false;
-  }
-};
+export const supabase = createClient(
+  keys.url || 'https://placeholder.supabase.co', 
+  keys.key || 'placeholder-key'
+);
 
-// Fallback preventivo
-const finalUrl = isValidUrl(keys.url) ? keys.url : 'https://your-project-id.supabase.co';
-const finalKey = keys.key || 'your-anon-key';
-
-export const supabase = createClient(finalUrl, finalKey);
-
-// Função para atualizar as chaves e recarregar
 export const updateSupabaseConfig = (url: string, key: string) => {
   localStorage.setItem('SB_URL', url);
   localStorage.setItem('SB_KEY', key);

@@ -1,29 +1,22 @@
-/*
-  SQL MIGRATIONS FOR SOFTWARE HOUSE FORTALEZA
-  Paste this into the Supabase SQL Editor to set up your tables.
-*/
+-- SQL MIGRATIONS FOR SOFTWARE HOUSE FORTALEZA
+-- Paste this into the Supabase SQL Editor to set up your tables.
 
 -- 1. Create a table for public profiles (tied to auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
-  role TEXT DEFAULT 'student' CHECK (role IN ('admin', 'student')),
+  role TEXT DEFAULT 'student' CHECK (role IN ('admin', 'student', 'instructor')),
   avatar_url TEXT,
   bio TEXT,
+  status TEXT DEFAULT 'active',
+  linkedin TEXT,
+  whatsapp TEXT,
+  discord TEXT,
   consent_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
-
--- 1.1 Add missing columns to profiles if they don't exist
-DO $$
-BEGIN
-    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
-    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS linkedin TEXT;
-    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS whatsapp TEXT;
-    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS discord TEXT;
-END $$;
 
 -- 2. Create a table for courses
 CREATE TABLE IF NOT EXISTS public.courses (

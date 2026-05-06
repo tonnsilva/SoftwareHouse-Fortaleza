@@ -12,12 +12,14 @@ import { supabase } from '../lib/supabase';
 
 export interface UserProfile {
   id?: string;
-  full_name: string;
+  name: string;
   email: string;
   role: 'admin' | 'student' | 'instructor';
   avatar_url: string;
   status: 'active' | 'inactive' | 'pending';
-  last_access?: string;
+  linkedin?: string;
+  whatsapp?: string;
+  discord?: string;
   created_at?: string;
 }
 
@@ -32,7 +34,7 @@ export const userService = {
     const { data, error } = await supabase
       .from(TABLE_NAME)
       .select('*')
-      .order('full_name', { ascending: true });
+      .order('name', { ascending: true });
     
     if (error) {
       console.error("Erro ao carregar usuários do Supabase:", error.message);

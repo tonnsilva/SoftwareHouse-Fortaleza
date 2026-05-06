@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
+import { Link } from 'react-router-dom';
 import { BookOpen, Plus, Trash2, Edit3, X, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { courseService, Course } from '../services/courseService';
@@ -289,12 +290,29 @@ export const Dashboard: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-        <div className="bg-zinc-900/20 border border-zinc-900 rounded-2xl p-8 min-h-[300px] flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mb-4 text-zinc-600">
-            <AlertCircle />
+        <div className="bg-zinc-900/20 border border-zinc-900 rounded-2xl p-8 min-h-[300px]">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="text-zinc-100 font-semibold tracking-tight">Membros da Equipe</h4>
+            <Link to="/usuarios" className="text-[10px] text-emerald-500 hover:underline uppercase font-bold tracking-widest">Ver Todos</Link>
           </div>
-          <h4 className="text-zinc-100 font-medium mb-2">Monitor de Sistema</h4>
-          <p className="text-zinc-600 text-sm max-w-xs">Todos os sistemas operacionais e integrações Supabase estão verdes (OK).</p>
+          <div className="space-y-4">
+            {/* Aqui poderíamos carregar de userService, mas deixaremos placeholders para preencher o layout */}
+            {[
+              { name: 'Admin Principal', role: 'Administrador', initial: 'A' },
+              { name: 'Lucas Silva', role: 'Instrutor', initial: 'L' },
+              { name: 'Beatriz Santos', role: 'Aluno', initial: 'B' }
+            ].map((member) => (
+              <div key={member.name} className="flex items-center gap-3 p-3 bg-black/40 rounded-xl border border-zinc-900/50">
+                <div className="w-8 h-8 rounded-full bg-emerald-600/20 text-emerald-500 flex items-center justify-center text-xs font-bold border border-emerald-500/10">
+                  {member.initial}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{member.name}</p>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-tighter">{member.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="bg-gradient-to-br from-emerald-950/20 to-transparent border border-emerald-500/10 rounded-2xl p-8 min-h-[300px]">
           <h4 className="text-emerald-400 text-sm font-semibold uppercase tracking-widest mb-6">Pipeline de Migração</h4>

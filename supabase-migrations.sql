@@ -16,20 +16,43 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 1.1 Add missing columns to profiles if they don't exist
+DO $$
+BEGIN
+    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS linkedin TEXT;
+    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS whatsapp TEXT;
+    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS discord TEXT;
+END $$;
+
 -- 2. Create a table for courses
 CREATE TABLE IF NOT EXISTS public.courses (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   slug TEXT,
   description TEXT,
+  instructor TEXT DEFAULT 'Software House Fortaleza',
   thumbnail_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 2.1 Create a table for projects
+CREATE TABLE IF NOT EXISTS public.projects (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  tags TEXT[],
+  status TEXT DEFAULT 'Em andamento',
+  repo_url TEXT,
+  demo_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
 -- 4. Policies for Profiles (Using blocks to avoid "already exists" errors)
 DO $$ 
@@ -56,6 +79,19 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Only admins can modify courses.') THEN
         CREATE POLICY "Only admins can modify courses." ON public.courses FOR ALL USING (
+            EXISTS (
+                SELECT 1 FROM public.profiles
+                WHERE id = auth.uid() AND role = 'admin'
+            )
+        );
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Projects are viewable by everyone.') THEN
+        CREATE POLICY "Projects are viewable by everyone." ON public.projects FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Only admins can modify projects.') THEN
+        CREATE POLICY "Only admins can modify projects." ON public.projects FOR ALL USING (
             EXISTS (
                 SELECT 1 FROM public.profiles
                 WHERE id = auth.uid() AND role = 'admin'

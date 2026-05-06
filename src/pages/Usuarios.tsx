@@ -27,12 +27,74 @@ export function Usuarios() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddingMode, setIsAddingMode] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState('');
+  const [formData, setFormData] = useState<Partial<UserProfile>>({
+    full_name: '',
+    email: '',
+    role: 'student',
+    status: 'active',
+    avatar_url: ''
+  });
 
   // Carrega os dados assim que o componente é montado na tela.
   useEffect(() => {
     loadUsers();
   }, []);
+
+  const handleOpenAdd = () => {
+    setFormData({
+      name: '',
+      email: '',
+      role: 'student',
+      status: 'active',
+      avatar_url: '',
+      linkedin: '',
+      whatsapp: '',
+      discord: ''
+    });
+    setEditingUser(null);
+    setIsAddingMode(true);
+  };
+
+  const handleOpenEdit = (user: UserProfile) => {
+    setFormData(user);
+    setEditingUser(user);
+    setIsAddingMode(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError('');
+      if (editingUser?.id) {
+        await userService.updateUser(editingUser.id, formData);
+      } else {
+        await userService.createUser(formData as Omit<UserProfile, 'id'>);
+      }
+      setIsAddingMode(false);
+      loadUsers();
+    } catch (err: any) {
+      console.error(err);
+      setError('Erro ao salvar usuário. Verifique se o e-mail já existe.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este membro?')) return;
+    try {
+      setLoading(true);
+      await userService.deleteUser(id);
+      loadUsers();
+    } catch (err: any) {
+      setError('Erro ao excluir usuário.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /**
    * FUNÇÃO: loadUsers
@@ -59,8 +121,8 @@ export function Usuarios() {
    * Isso evita chamadas desnecessárias ao banco de dados enquanto você digita.
    */
   const filteredUsers = users.filter(user => 
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -70,13 +132,156 @@ export function Usuarios() {
         <Button 
           size="sm" 
           className="bg-emerald-600 hover:bg-emerald-500 gap-2"
-          onClick={() => setIsAddingMode(true)}
+          onClick={handleOpenAdd}
         >
           <UserPlus size={16} /> Adicionar Membro
         </Button>
       }
     >
       <div className="space-y-6">
+        {/* MODAL DE ADICIONAR/EDITAR */}
+        <AnimatePresence>
+          {isAddingMode && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-zinc-900 border border-zinc-800 w-full max-w-lg rounded-3xl p-8 shadow-2xl"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-white">
+                    {editingUser ? 'Editar Membro' : 'Novo Membro'}
+                  </h3>
+                  <button onClick={() => setIsAddingMode(false)} className="text-zinc-500 hover:text-white">
+                    <XCircle size={24} />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-zinc-500 uppercase ml-1">Nome Completo</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 transition-all"
+                      placeholder="Ex: Carlos Oliveira"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-zinc-500 uppercase ml-1">E-mail</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 transition-all"
+                      placeholder="carlos@shf.com.br"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-zinc-500 uppercase ml-1">Função</label>
+                      <select 
+                        value={formData.role}
+                        onChange={(e) => setFormData({...formData, role: e.target.value as any})}
+                        className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 transition-all"
+                      >
+                        <option value="student">Aluno</option>
+                        <option value="instructor">Instrutor</option>
+                        <option value="admin">Administrador</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-zinc-500 uppercase ml-1">Status</label>
+                      <select 
+                        value={formData.status}
+                        onChange={(e) => setFormData({...formData, status: e.target.value as any})}
+                        className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 transition-all"
+                      >
+                        <option value="active">Ativo</option>
+                        <option value="pending">Pendente</option>
+                        <option value="inactive">Inativo</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-zinc-500 uppercase ml-1">URL do Avatar (Foto)</label>
+                    <input 
+                      type="url" 
+                      value={formData.avatar_url}
+                      onChange={(e) => setFormData({...formData, avatar_url: e.target.value})}
+                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 transition-all"
+                      placeholder="https://..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">LinkedIn</label>
+                      <input 
+                        type="text" 
+                        value={formData.linkedin || ''}
+                        onChange={(e) => setFormData({...formData, linkedin: e.target.value})}
+                        className="w-full bg-black border border-zinc-800 rounded-xl px-2 py-2 text-[10px] outline-none focus:border-emerald-500 transition-all"
+                        placeholder="username"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">WhatsApp</label>
+                      <input 
+                        type="text" 
+                        value={formData.whatsapp || ''}
+                        onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
+                        className="w-full bg-black border border-zinc-800 rounded-xl px-2 py-2 text-[10px] outline-none focus:border-emerald-500 transition-all"
+                        placeholder="55..."
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Discord</label>
+                      <input 
+                        type="text" 
+                        value={formData.discord || ''}
+                        onChange={(e) => setFormData({...formData, discord: e.target.value})}
+                        className="w-full bg-black border border-zinc-800 rounded-xl px-2 py-2 text-[10px] outline-none focus:border-emerald-500 transition-all"
+                        placeholder="user#0000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 flex gap-3">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      className="flex-1" 
+                      onClick={() => setIsAddingMode(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="flex-1 bg-emerald-600"
+                      isLoading={loading}
+                    >
+                      {editingUser ? 'Atualizar' : 'Salvar'}
+                    </Button>
+                  </div>
+                </form>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* EXIBIÇÃO DE ERRO: Caso algo dê errado na comunicação via API */}
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm flex items-center gap-2">
@@ -150,8 +355,8 @@ export function Usuarios() {
                           <div className="relative">
                             {/* AVATAR: Usa imagem do banco ou gera uma baseada nas iniciais do nome */}
                             <img 
-                              src={user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name)}&background=10b981&color=fff`} 
-                              alt={user.full_name}
+                              src={user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=10b981&color=fff`} 
+                              alt={user.name}
                               className="w-10 h-10 rounded-full object-cover border border-zinc-800"
                             />
                             {user.status === 'active' && (
@@ -160,7 +365,7 @@ export function Usuarios() {
                           </div>
                           <div>
                             <div className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">
-                              {user.full_name}
+                              {user.name}
                             </div>
                             <div className="text-xs text-zinc-500 flex items-center gap-1">
                               <Mail size={10} /> {user.email}
@@ -205,10 +410,16 @@ export function Usuarios() {
                       <td className="px-6 py-4 text-right">
                         {/* BOTÕES DE AÇÃO: Aparecem suavemente ao passar o mouse na linha (hover) */}
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                          <button 
+                            onClick={() => handleOpenEdit(user)}
+                            className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+                          >
                             <Edit2 size={16} />
                           </button>
-                          <button className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                          <button 
+                            onClick={() => handleDelete(user.id!)}
+                            className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>

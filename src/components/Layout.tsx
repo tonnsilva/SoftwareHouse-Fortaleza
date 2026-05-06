@@ -78,9 +78,24 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = "Dashboard", h
 
   // LINKS Externos/Redes Sociais
   const socialLinks = [
-    { icon: <Linkedin size={18} />, label: "LinkedIn", href: "https://linkedin.com", color: "hover:text-blue-400" },
-    { icon: <MessageCircle size={18} />, label: "WhatsApp", href: "https://wa.me/5500000000000", color: "hover:text-green-400" },
-    { icon: <Gamepad2 size={18} />, label: "Discord", href: "https://discord.gg", color: "hover:text-indigo-400" },
+    { 
+      icon: <Linkedin size={18} />, 
+      label: "LinkedIn", 
+      href: "https://www.linkedin.com/company/software-house-fortaleza", 
+      color: "hover:text-blue-400" 
+    },
+    { 
+      icon: <MessageCircle size={18} />, 
+      label: "WhatsApp", 
+      href: "https://wa.me/5585999999999", // Número SHF
+      color: "hover:text-green-400" 
+    },
+    { 
+      icon: <Gamepad2 size={18} />, 
+      label: "Discord", 
+      href: "https://discord.gg/shf", 
+      color: "hover:text-indigo-400" 
+    },
   ];
 
   return (
